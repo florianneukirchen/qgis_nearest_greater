@@ -159,8 +159,11 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         # We need to access features using their id
         features = source.getFeatures(QgsFeatureRequest(expr))
         feat_by_id = {f.id():f for f in features}
-
-
+        
+        # Give feedback about null values etc.
+        count_null = source.featureCount() - len(sorted_features)
+        feedback.pushInfo('{} of {} features have NULL as value and are ignored.'.format(count_null, source.featureCount()))
+        
 
         for value, f in sorted_features:
             # Stop the algorithm if cancel button has been clicked
