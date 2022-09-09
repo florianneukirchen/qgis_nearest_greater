@@ -1,26 +1,11 @@
-Plugin Builder Results
+QGIS Plugin to get ID of and distance to the nearest feature with greater value in a certain field of a point layer.
 
-Your plugin DistanceNearestGreater was created in:
-    /home/riannek/python/qgis-plugins/plugins/distance_nearest_greater
+Get ID of and distance to the nearest neighbour with greater value in a certain field. Input is a points layer. 
+The main output is a points layer with added attributes nearest_gt_dist and nearest_gt_id.
+Also returns a lines layer with connecting lines, as well as basic statistics of the distances (min, max, mean, quantiles).
 
-Your QGIS plugin directory is located at:
-    /home/riannek/.local/share/QGIS/QGIS3/profiles/default/python/plugins
+Use cases: 
+- Which is the next larger city? 
+- Which is the closest peak with higher elevation? 
+- Useful for spatial analysis or to categorize features in order to apply different styles (e.g. major and minor summits). 
 
-What's Next:
-
-  * Copy the entire directory containing your new plugin to the QGIS plugin
-    directory
-
-  * Run the tests (``make test``)
-
-  * Test the plugin by enabling it in the QGIS plugin manager
-
-  * Customize it by editing the implementation file: ``nearest_greater.py``
-
-  * You can use the Makefile to compile your Ui and resource files when
-    you make changes. This requires GNU make (gmake)
-
-For more information, see the PyQGIS Developer Cookbook at:
-http://www.qgis.org/pyqgis-cookbook/index.html
-
-(C) 2011-2018 GeoApt LLC - geoapt.com
