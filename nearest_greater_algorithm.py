@@ -397,14 +397,14 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         lowercase alphanumeric characters only and no spaces or other
         formatting characters.
         """
-        return 'Nearest with greater value'
+        return 'nearestgreater'
 
     def displayName(self):
         """
         Returns the translated algorithm name, which should be used for any
         user-visible display of the algorithm name.
         """
-        return self.tr(self.name())
+        return self.tr('nearest with greater value')
 
     def group(self):
         """
