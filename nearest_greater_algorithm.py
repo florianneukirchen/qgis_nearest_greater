@@ -44,7 +44,9 @@ from qgis.core import (QgsProcessing,
                        QgsFeatureRequest,
                        QgsSpatialIndex,
                        QgsProcessingOutputNumber,
-                       QgsProcessingParameterNumber)
+                       QgsProcessingParameterNumber,
+                       QgsGeometry,
+                       QgsWkbTypes)
 
 class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
     """
@@ -68,6 +70,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
     INPUT = 'INPUT'
     COMPARE_FIELD = 'COMPARE_FIELD'
     DIST_FOR_MAX = 'DIST_FOR_MAX'
+    LINEOUTPUT = 'LINEOUTPUT'
 
 
     def initAlgorithm(self, config):
@@ -136,6 +139,13 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
                 self.tr('Output Nearest Greater')
             )
         )
+        
+        self.addParameter(
+            QgsProcessingParameterFeatureSink(
+                self.LINEOUTPUT,
+                self.tr('Lines Nearest Greater')
+            )
+        )
 
     def processAlgorithm(self, parameters, context, feedback):
         """
@@ -164,10 +174,12 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         out_fields.append(QgsField('nearest_gt_dist', QVariant.Double))
         out_fields.append(QgsField('nearest_gt_id', QVariant.Int))
 
-        # Get the sink for output
+        # Get the sinks for output
         (sink, dest_id) = self.parameterAsSink(parameters, self.OUTPUT,
                 context, out_fields, source.wkbType(), source.sourceCrs())
 
+        (linesink, line_dest_id) = self.parameterAsSink(parameters, self.LINEOUTPUT,
+                context, out_fields, QgsWkbTypes.LineString, source.sourceCrs())
 
         # Compute the number of steps to display within the progress bar 
         total = 100.0 / source.featureCount() if source.featureCount() else 0
@@ -206,13 +218,14 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         # Give feedback about null values etc.
         count_null = source.featureCount() - len(sorted_features)
         feedback.pushInfo('{} of {} features have NULL as value and are ignored.'.format(count_null, source.featureCount()))
-      
+
+        # The main loop      
 
         for value, f in sorted_features:
             # Stop the algorithm if cancel button has been clicked
             if feedback.isCanceled():
                 break
-            # Set some values for the greatest feature
+            # Attributes for the greatest feature
             if f == last_feature:
                 nearest = f.id()
                 distance = dist_for_max
@@ -224,11 +237,11 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
                 nearest_geom = feat_by_id[nearest_id].geometry().asPoint()
                 distance = f.geometry().asPoint().distance(nearest_geom)
                 # Now remove f from the index.
-                # Since our feaures are sorted by value, this means that there are 
+                # Since our features are sorted by value, this means that there are 
                 # always only those features in the index with a larger value.
                 index.deleteFeature(f)
 
-
+            # In order to add our new fiels, we need to create a new point feature
             newfeat = QgsFeature()
             newfeat.setFields(out_fields)
             newfeat.setGeometry(f.geometry())
@@ -241,6 +254,15 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
 
             # Add the feature in the sink
             sink.addFeature(newfeat, QgsFeatureSink.FastInsert)
+            
+            # Create connecting lines in the line output layer
+
+            linegeom = QgsGeometry.fromPolylineXY([f.geometry().asPoint(), nearest_geom])                
+            linefeat = QgsFeature()
+            linefeat.setFields(out_fields)
+            linefeat.setGeometry(linegeom)
+            linefeat.setAttributes(new_attributes)             
+            linesink.addFeature(linefeat, QgsFeatureSink.FastInsert)
 
             # Update the progress bar
             feedback.setProgress(int(current * total))
@@ -256,6 +278,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
             return {}
 
         return {self.OUTPUT: dest_id, 
+                self.LINEOUTPUT: line_dest_id,
                 'ID_MAX_VALUE': last_feature.id(),
                 'NUMBER_PROCESSED_FEATURES':len(sorted_features),
                 'NUMBER_IGNORED_FEATURES':count_null
