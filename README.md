@@ -1,5 +1,5 @@
 # qgis_nearest_greater
-QGIS Plugin to get ID of and distance to the nearest feature with greater value in a certain field of a point layer.
+QGIS Plugin to get name (or ID) of and distance to the nearest feature with greater value in a certain field of a point layer.
 
 Get name (or ID) of and distance to the nearest neighbour with greater value in a certain field. Input is a points layer. 
 The main output is a points layer with added attributes nearest_gt_dist and nearest_gt_id.
