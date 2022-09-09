@@ -100,12 +100,15 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
 
         # Choose a number for the distance used for the feature
         # with the greatest value. Can be NULL or any number.
-        self.addParameter(
-            QgsProcessingParameterNumber(
+        param = QgsProcessingParameterNumber(
                 self.DIST_FOR_MAX, 
                 self.tr('Set a distance value for the greatest feature'),
                 QgsProcessingParameterNumber.Double,
-                1000000000))
+                1000000000)
+        param.setMetadata({'widget_wrapper': { 'decimals': 0 }})
+        param.setMinimum(0)
+        self.addParameter(param)
+      
 
         # Should features with NULL value be added to the output layer?
         self.addParameter(
@@ -228,6 +231,9 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         (linesink, line_dest_id) = self.parameterAsSink(parameters, self.LINEOUTPUT,
                 context, out_fields, QgsWkbTypes.LineString, source.sourceCrs())
 
+        if source.sourceCrs().isGeographic():
+            feedback.pushWarning('WARNING: The input is in a geographic CRS. Consider using a projected CRS.')
+
         # Compute the number of steps to display within the progress bar 
         total = 100.0 / source.featureCount() if source.featureCount() else 0
         current = 0
@@ -279,6 +285,14 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
             if f == last_feature:
                 nearest = f.id()
                 distance = dist_for_max
+                
+                if dist_for_max == 0:
+                    distance = NULL
+                else:
+                    distance = dist_for_max
+
+
+
             else:
                 # Get the id of the nearest neighbor
                 # Note: The returned list always includes f itself, 
