@@ -4,7 +4,9 @@
 /***************************************************************************
  NearestGreater
                                  A QGIS plugin
- Get id of and distance to the nearest feature with greater value in a certain field.
+ Get name (or ID) of and distance to the nearest feature with greater value 
+ in a certain field.
+ 
  Template by Plugin Builder: http://g-sherman.github.io/Qgis-Plugin-Builder/
                               -------------------
         begin                : 2022-09-07

@@ -4,8 +4,9 @@
 /***************************************************************************
  NearestGreater
                                  A QGIS plugin
- Get ID of and distance to the nearest feature with greater value in a certain field of a point layer.
- Returns point layer with added attributes and a line layer with connecting lines.
+ Get name (or ID) of and distance to the nearest feature with greater value 
+ in a certain field of a point layer. Returns point layer with added 
+ attributes and a line layer with connecting lines.
                               -------------------
         begin                : 2022-09-07
         copyright            : (C) 2022 by Florian Neukirchen
@@ -53,11 +54,13 @@ from qgis.core import (QgsProcessing,
 
 class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
     """
-    Get ID of and distance to the nearest feature with greater value in a certain field of a point layer.
+    Get name (or ID) of and distance to the nearest feature with greater value in a certain field of a point layer.
     
-    Get ID of and distance to the nearest neighbour with greater value in a certain field. Input is a points layer. 
-    The main output is a points layer with added attributes nearest_gt_dist and nearest_gt_id.
+    Get name (or ID) of and distance to the nearest neighbour with greater value in a certain field. Input is a points layer. 
+    The main output is a points layer with added attributes nearest_gt_dist and nearest_gt_name.
     Also returns a lines layer with connecting lines, as well as basic statistics of the distances (min, max, mean, quantiles).
+    The distance to be returned for the feature with the greatest value can be set, 
+    it should be 0 (replaced by NULL in the output) or a very large number.
     """
 
     # Constants used to refer to parameters and outputs. They will be
@@ -70,6 +73,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
     DIST_FOR_MAX = 'DIST_FOR_MAX'
     LINEOUTPUT = 'LINEOUTPUT'
     KEEP = 'KEEP'
+    NAME_FIELD = 'NAME_FIELD'
 
 
     def initAlgorithm(self, config):
@@ -87,7 +91,6 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
                 [QgsProcessing.TypeVectorPoint]
             )
         )
-
 
         # Select the field containing values to be compared
         self.addParameter(
@@ -109,6 +112,14 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         param.setMinimum(0)
         self.addParameter(param)
       
+        # Select the field of name or ID to identify nearest neighbor
+        self.addParameter(
+            QgsProcessingParameterField(
+                self.NAME_FIELD,
+                self.tr('Identify nearest greater neighbor by field'),
+                '',
+                self.INPUT))
+
 
         # Should features with NULL value be added to the output layer?
         self.addParameter(
@@ -208,6 +219,11 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
             self.COMPARE_FIELD,
             context)
 
+        name_field = self.parameterAsString(
+            parameters,
+            self.NAME_FIELD,
+            context)
+
         dist_for_max = self.parameterAsDouble(
             parameters,
             self.DIST_FOR_MAX,
@@ -222,7 +238,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         # Define fields
         out_fields = source.fields()
         out_fields.append(QgsField('nearest_gt_dist', QVariant.Double))
-        out_fields.append(QgsField('nearest_gt_id', QVariant.Int))
+        out_fields.append(QgsField('nearest_gt_name', QVariant.String))
 
         # Get the sinks for output
         (sink, dest_id) = self.parameterAsSink(parameters, self.OUTPUT,
@@ -283,7 +299,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
                 break
             # Attributes for the greatest feature
             if f == last_feature:
-                nearest = f.id()
+                nearest_name = f[name_field]
                 distance = dist_for_max
                 
                 if dist_for_max == 0:
@@ -298,6 +314,8 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
                 # Note: The returned list always includes f itself, 
                 # we need the second "neighbor".
                 nearest_id = index.nearestNeighbor(f.geometry().asPoint(), 2)[1]
+                
+                nearest_name = feat_by_id[nearest_id][name_field]
                 nearest_geom = feat_by_id[nearest_id].geometry().asPoint()
                 distance = f.geometry().asPoint().distance(nearest_geom)
                 dist_list.append(distance)
@@ -313,7 +331,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
   
             new_attributes = f.attributes()
             new_attributes.append(distance) # Field 'nearest_gt_dist'
-            new_attributes.append(nearest_id) # Field 'nearest_gt_id'
+            new_attributes.append(nearest_name) # Field 'nearest_gt_name'
             
             newfeat.setAttributes(new_attributes)          
 
@@ -352,7 +370,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
   
                 new_attributes = f.attributes()
                 new_attributes.append(NULL) # Field 'nearest_gt_dist'
-                new_attributes.append(NULL) # Field 'nearest_gt_id'
+                new_attributes.append(NULL) # Field 'nearest_gt_name'
             
                 newfeat.setAttributes(new_attributes)          
             
@@ -428,3 +446,4 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
 
     def createInstance(self):
         return NearestGreaterAlgorithm()
+
