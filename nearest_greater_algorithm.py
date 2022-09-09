@@ -46,7 +46,9 @@ from qgis.core import (QgsProcessing,
                        QgsProcessingOutputNumber,
                        QgsProcessingParameterNumber,
                        QgsGeometry,
-                       QgsWkbTypes)
+                       QgsWkbTypes,
+                       QgsProcessingParameterBoolean,
+                       NULL)
 
 class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
     """
@@ -71,6 +73,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
     COMPARE_FIELD = 'COMPARE_FIELD'
     DIST_FOR_MAX = 'DIST_FOR_MAX'
     LINEOUTPUT = 'LINEOUTPUT'
+    KEEP = 'KEEP'
 
 
     def initAlgorithm(self, config):
@@ -94,7 +97,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterField(
                 self.COMPARE_FIELD,
-                'Field with values to compare',
+                self.tr('Field with values to compare'),
                 '',
                 self.INPUT))
 
@@ -104,10 +107,16 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterNumber(
                 self.DIST_FOR_MAX, 
-                'Distance value for the greatest feature',
+                self.tr('Set a distance value for the greatest feature'),
                 QgsProcessingParameterNumber.Double,
                 1000000000))
-                
+
+        # Should features with NULL value be added to the output layer?
+        self.addParameter(
+            QgsProcessingParameterBoolean(
+                self.KEEP, 
+                self.tr('Keep features with NULL value in output layer'),
+                True))                
                 
         # Add some additional output fields
         self.addOutput(
@@ -167,6 +176,11 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
             parameters,
             self.DIST_FOR_MAX,
             context)
+            
+        keep = self.parameterAsBoolean(
+            parameters,
+            self.KEEP,
+            context)
 
             
         # Define fields
@@ -197,7 +211,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         except ValueError:
             sorted_features = [(f.attribute(compare_field), f) for f in features]
             feedback.pushInfo('Converting the field to floating point value failed.')
-            feedback.pushWarning('WARNING: The fields will be compared as type: {}'.format(
+            feedback.pushWarning('WARNING: The fields will be compared as type: '.format(
                 type(sorted_features[0][0]).__name__))    
         
         # Sort the Features by the value of the field
@@ -267,6 +281,34 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
             # Update the progress bar
             feedback.setProgress(int(current * total))
             current = current + 1
+
+        feedback.pushInfo('Processing finished.')
+
+        # Optionally add NULL features to output
+        if keep:
+            feedback.pushInfo('Add features with null value.')
+            expr = QgsExpression('"{}" IS NULL'.format(compare_field))
+            features = source.getFeatures(QgsFeatureRequest(expr))
+
+            # The loop is similar to the main loop
+            for f in features:
+                if feedback.isCanceled():
+                    break
+              
+                newfeat = QgsFeature()
+                newfeat.setFields(out_fields)
+                newfeat.setGeometry(f.geometry())
+  
+                new_attributes = f.attributes()
+                new_attributes.append(NULL) # Field 'nearest_gt_dist'
+                new_attributes.append(NULL) # Field 'nearest_gt_id'
+            
+                newfeat.setAttributes(new_attributes)          
+            
+                sink.addFeature(newfeat, QgsFeatureSink.FastInsert)
+
+                feedback.setProgress(int(current * total))
+                current = current + 1
 
         # Return the results of the algorithm. In this case our only result is
         # the feature sink which contains the processed features, but some
