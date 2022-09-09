@@ -30,6 +30,7 @@ __copyright__ = '(C) 2022 by Florian Neukirchen'
 
 __revision__ = '$Format:%H$'
 
+from statistics import quantiles, mean
 from qgis.PyQt.QtCore import QCoreApplication, QVariant, NULL
 from qgis.core import (QgsProcessing,
                        QgsFeatureSink,
@@ -138,6 +139,43 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
                 self.tr('Number of ignored features with NULL values.')
             ))   
 
+        self.addOutput(
+            QgsProcessingOutputNumber(
+                'MIN_DIST',
+                self.tr('Smallest distance.')
+            ))  
+
+        self.addOutput(
+            QgsProcessingOutputNumber(
+                'MAX_DIST',
+                self.tr('Largest calculated distance.')
+            ))  
+
+        self.addOutput(
+            QgsProcessingOutputNumber(
+                'MEAN_DIST',
+                self.tr('Mean of calculated distances.')
+            ))  
+
+        self.addOutput(
+            QgsProcessingOutputNumber(
+                'Q1_DIST',
+                self.tr('First quartile of distances.')
+            ))  
+
+        self.addOutput(
+            QgsProcessingOutputNumber(
+                'Q2_DIST',
+                self.tr('Second quartile (median) of distances.')
+            ))  
+
+        self.addOutput(
+            QgsProcessingOutputNumber(
+                'Q3_DIST',
+                self.tr('Third quartile of distances.')
+            ))  
+
+            
 
         # We add a feature sink in which to store our processed features (this
         # usually takes the form of a newly created vector layer when the
@@ -220,6 +258,9 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         # Algorithm does not work with the last one (greatest value) 
         last_feature = sorted_features[-1][1]
 
+        # A list of the calculated distances, to get some stats
+        dist_list = []
+
         # Create a spatial index
         # The Features iterator works only once
         features = source.getFeatures(QgsFeatureRequest(expr))
@@ -250,6 +291,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
                 nearest_id = index.nearestNeighbor(f.geometry().asPoint(), 2)[1]
                 nearest_geom = feat_by_id[nearest_id].geometry().asPoint()
                 distance = f.geometry().asPoint().distance(nearest_geom)
+                dist_list.append(distance)
                 # Now remove f from the index.
                 # Since our features are sorted by value, this means that there are 
                 # always only those features in the index with a larger value.
@@ -310,6 +352,20 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
                 feedback.setProgress(int(current * total))
                 current = current + 1
 
+        # Calculate some statistics
+        min_dist = min(dist_list)
+        max_dist = max(dist_list)
+        mean_dist = mean(dist_list)
+        quantiles_dist = quantiles(dist_list)
+
+        feedback.pushInfo('Distance Statistics:')
+        feedback.pushInfo('MIN:    {}'.format(min_dist))        
+        feedback.pushInfo('MAX:    {}'.format(max_dist))         
+        feedback.pushInfo('MEAN:   {}'.format(mean_dist))       
+        feedback.pushInfo('Q1:     {}'.format(quantiles_dist[0])) 
+        feedback.pushInfo('MEDIAN: {}'.format(quantiles_dist[1])) 
+        feedback.pushInfo('Q3:     {}'.format(quantiles_dist[2])) 
+
         # Return the results of the algorithm. In this case our only result is
         # the feature sink which contains the processed features, but some
         # algorithms may return multiple feature sinks, calculated numeric
@@ -323,7 +379,13 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
                 self.LINEOUTPUT: line_dest_id,
                 'ID_MAX_VALUE': last_feature.id(),
                 'NUMBER_PROCESSED_FEATURES':len(sorted_features),
-                'NUMBER_IGNORED_FEATURES':count_null
+                'NUMBER_IGNORED_FEATURES':count_null,
+                'MIN_DIST':min_dist,
+                'MAX_DIST':max_dist,
+                'MEAN_DIST':mean_dist,
+                'Q1_DIST':quantiles_dist[0],
+                'Q2_DIST':quantiles_dist[1],                
+                'Q3_DIST':quantiles_dist[2],
                 }
 
 
