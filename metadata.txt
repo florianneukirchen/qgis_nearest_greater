@@ -35,7 +35,7 @@ hasProcessingProvider=yes
 # Tags are comma separated with spaces allowed
 tags=python, vector, distance, closest, nearest, point
 
-homepage=https://www.riannek.de/qgis-nearest-with-greater/
+homepage=https://www.riannek.de/code/qgis-nearest-with-greater/
 category=Analysis
 icon=icon.png
 # experimental flag
