@@ -58,7 +58,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
     
     Get name (or ID) of and distance to the nearest neighbour with greater value in a certain field. Input is a points layer. 
     The main output is a points layer with added attributes nearest_gt_dist and nearest_gt_name.
-    Also returns a lines layer with connecting lines, as well as basic statistics of the distances (min, max, mean, quantiles).
+    Also returns a lines layer with connecting lines, as well as basic statistics of the distances (min, max, mean, quartiles).
     The distance to be returned for the feature with the greatest value can be set, 
     it should be 0 (replaced by NULL in the output) or a very large number.
     """
