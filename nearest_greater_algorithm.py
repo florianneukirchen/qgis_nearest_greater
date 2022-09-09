@@ -30,7 +30,7 @@ __copyright__ = '(C) 2022 by Florian Neukirchen'
 
 __revision__ = '$Format:%H$'
 
-from qgis.PyQt.QtCore import QCoreApplication, QVariant
+from qgis.PyQt.QtCore import QCoreApplication, QVariant, NULL
 from qgis.core import (QgsProcessing,
                        QgsFeatureSink,
                        QgsProcessingAlgorithm,
@@ -42,7 +42,9 @@ from qgis.core import (QgsProcessing,
                        QgsFeature,
                        QgsExpression,
                        QgsFeatureRequest,
-                       QgsSpatialIndex)
+                       QgsSpatialIndex,
+                       QgsProcessingOutputNumber,
+                       QgsProcessingParameterNumber)
 
 class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
     """
@@ -65,6 +67,8 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
     OUTPUT = 'OUTPUT'
     INPUT = 'INPUT'
     COMPARE_FIELD = 'COMPARE_FIELD'
+    DIST_FOR_MAX = 'DIST_FOR_MAX'
+
 
     def initAlgorithm(self, config):
         """
@@ -92,13 +96,36 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
                 self.INPUT))
 
 
-        # Select the field containing values to be compared
+        # Choose a number for the distance used for the feature
+        # with the greatest value. Can be NULL or any number.
         self.addParameter(
-            QgsProcessingParameterField(
-                self.COMPARE_FIELD,
-                'Field with values to compare',
-                '',
-                self.INPUT))
+            QgsProcessingParameterNumber(
+                self.DIST_FOR_MAX, 
+                'Distance value for the greatest feature',
+                QgsProcessingParameterNumber.Double,
+                1000000000))
+                
+                
+        # Add some additional output fields
+        self.addOutput(
+            QgsProcessingOutputNumber(
+                'ID_MAX_VALUE',
+                self.tr('ID of Feature with max value')
+            ))
+
+        self.addOutput(
+            QgsProcessingOutputNumber(
+                'NUMBER_PROCESSED_FEATURES',
+                self.tr('Number of features that have been processed.')
+            ))   
+
+
+        self.addOutput(
+            QgsProcessingOutputNumber(
+                'NUMBER_IGNORED_FEATURES',
+                self.tr('Number of ignored features with NULL values.')
+            ))   
+
 
         # We add a feature sink in which to store our processed features (this
         # usually takes the form of a newly created vector layer when the
@@ -106,7 +133,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterFeatureSink(
                 self.OUTPUT,
-                self.tr('Nearest greater')
+                self.tr('Output Nearest Greater')
             )
         )
 
@@ -120,12 +147,18 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         # dictionary returned by the processAlgorithm function.
         source = self.parameterAsSource(parameters, self.INPUT, context)
 
-        # Get the compare field
+        # Get the parameters
         compare_field = self.parameterAsString(
             parameters,
             self.COMPARE_FIELD,
             context)
 
+        dist_for_max = self.parameterAsDouble(
+            parameters,
+            self.DIST_FOR_MAX,
+            context)
+
+            
         # Define fields
         out_fields = source.fields()
         out_fields.append(QgsField('nearest_gt_dist', QVariant.Double))
@@ -163,7 +196,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         # Give feedback about null values etc.
         count_null = source.featureCount() - len(sorted_features)
         feedback.pushInfo('{} of {} features have NULL as value and are ignored.'.format(count_null, source.featureCount()))
-        
+      
 
         for value, f in sorted_features:
             # Stop the algorithm if cancel button has been clicked
@@ -172,7 +205,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
             # Set some values for the greatest feature
             if f == last_feature:
                 nearest = f.id()
-                distance = 100000000000
+                distance = dist_for_max
             else:
                 # Get the id of the nearest neighbor
                 # Note: The returned list always includes f itself, 
@@ -209,7 +242,14 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         # statistics, etc. These should all be included in the returned
         # dictionary, with keys matching the feature corresponding parameter
         # or output names.
-        return {self.OUTPUT: dest_id}
+        if feedback.isCanceled():
+            return {}
+
+        return {self.OUTPUT: dest_id, 
+                'ID_MAX_VALUE': last_feature.id(),
+                'NUMBER_PROCESSED_FEATURES':len(sorted_features),
+                'NUMBER_IGNORED_FEATURES':count_null
+                }
 
 
     def name(self):
