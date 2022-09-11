@@ -137,7 +137,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         self.addOutput(
             QgsProcessingOutputNumber(
                 'ID_MAX_VALUE',
-                self.tr('ID of Feature with max value')
+                self.tr('Name or ID of Feature with max value')
             ))
 
         self.addOutput(
@@ -255,7 +255,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
                 context, out_fields, QgsWkbTypes.LineString, source.sourceCrs())
 
         if source.sourceCrs().isGeographic():
-            feedback.pushWarning('WARNING: The input is in a geographic CRS. Consider using a projected CRS.')
+            feedback.pushWarning(self.tr('WARNING: The input is in a geographic CRS. Consider using a projected CRS.'))
 
         # Compute the number of steps to display within the progress bar 
         total = 100.0 / source.featureCount() if source.featureCount() else 0
@@ -272,7 +272,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
             sorted_features = [(float(f.attribute(compare_field)), f) for f in features]
         except ValueError:
             sorted_features = [(f.attribute(compare_field), f) for f in features]
-            feedback.pushInfo('Converting the field to floating point value failed.')
+            feedback.pushInfo(self.tr('Converting the field to floating point value failed.'))
             feedback.pushWarning('WARNING: The fields will be compared as type: '.format(
                 type(sorted_features[0][0]).__name__))    
         
@@ -299,12 +299,12 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         
         # Give feedback about null values etc.
         count_null = source.featureCount() - len(sorted_features)
-        feedback.pushInfo('{} of {} features have NULL as value and are ignored.'.format(count_null, source.featureCount()))
+        feedback.pushInfo(self.tr('{0} of {1} features have NULL as value and are ignored.').format(count_null, source.featureCount()))
         list_names = [f[name_field] for v, f in sorted_features]
         if len(list_names) > len(set(list_names)):
-            feedback.pushWarning('WARNING: There are non unique names in the selected field, it might be better to use another field als ID.')
+            feedback.pushWarning(self.tr('WARNING: There are non unique names in the selected field, it might be better to use another field als ID.'))
         if NULL in list_names:
-            feedback.pushWarning('WARNING: There are NULL values in the selected field, it might be better to use another field als ID.')
+            feedback.pushWarning(self.tr('WARNING: There are NULL values in the selected field, it might be better to use another field als ID.'))
         
             
 
@@ -371,11 +371,11 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
             feedback.setProgress(int(current * total))
             current = current + 1
 
-        feedback.pushInfo('Processing finished.')
+        feedback.pushInfo(self.tr('Processing finished.'))
 
         # Optionally add NULL features to output
         if keep:
-            feedback.pushInfo('Add features with null value.')
+            feedback.pushInfo(self.tr('Add features with null value.'))
             expr = QgsExpression('"{}" IS NULL'.format(compare_field))
             features = source.getFeatures(QgsFeatureRequest(expr))
 
@@ -405,7 +405,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         mean_dist = mean(dist_list)
         quantiles_dist = quantiles(dist_list)
 
-        feedback.pushInfo('Distance Statistics:')
+        feedback.pushInfo(self.tr('Distance Statistics:'))
         feedback.pushInfo('MIN:    {}'.format(min_dist))        
         feedback.pushInfo('MAX:    {}'.format(max_dist))         
         feedback.pushInfo('MEAN:   {}'.format(mean_dist))       
