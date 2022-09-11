@@ -24,7 +24,7 @@ Use cases:
 - Warn if the selected name field contains NULL or non-unique values
 - Mark more strings for translation
 
-### 0.1 (2022-11)
+### 0.1 (2022-09)
 - Initial release
 
 
