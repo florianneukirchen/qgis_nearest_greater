@@ -30,7 +30,11 @@ repository=https://github.com/florianneukirchen/qgis_nearest_greater
 
 hasProcessingProvider=yes
 # Uncomment the following line and add your changelog:
-# changelog=
+
+changelog=0.2 
+    - Return additional field 'nearest_gt_count' with a count of the incoming links (i.e. connecting lines to points with smaller value)
+    0.1 (2022-09)
+    - Initial version
 
 # Tags are comma separated with spaces allowed
 tags=python, vector, distance, closest, nearest, point

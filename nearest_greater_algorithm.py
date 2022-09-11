@@ -239,6 +239,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         out_fields = source.fields()
         out_fields.append(QgsField('nearest_gt_dist', QVariant.Double))
         out_fields.append(QgsField('nearest_gt_name', QVariant.String))
+        out_fields.append(QgsField('nearest_gt_count', QVariant.Int))
 
         # Get the sinks for output
         (sink, dest_id) = self.parameterAsSink(parameters, self.OUTPUT,
@@ -277,6 +278,9 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
 
         # A list of the calculated distances, to get some stats
         dist_list = []
+        
+        # A list of the ids of nearest features for the count
+        nearest_id_list = []
 
         # Create a spatial index
         # The Features iterator works only once
@@ -314,11 +318,14 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
                 # Note: The returned list always includes f itself, 
                 # we need the second "neighbor".
                 nearest_id = index.nearestNeighbor(f.geometry().asPoint(), 2)[1]
-                
+
+                nearest_id_list.append(nearest_id)
                 nearest_name = feat_by_id[nearest_id][name_field]
                 nearest_geom = feat_by_id[nearest_id].geometry().asPoint()
                 distance = f.geometry().asPoint().distance(nearest_geom)
                 dist_list.append(distance)
+                               
+
                 # Now remove f from the index.
                 # Since our features are sorted by value, this means that there are 
                 # always only those features in the index with a larger value.
@@ -332,6 +339,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
             new_attributes = f.attributes()
             new_attributes.append(distance) # Field 'nearest_gt_dist'
             new_attributes.append(nearest_name) # Field 'nearest_gt_name'
+            new_attributes.append(nearest_id_list.count(f.id())) # Field 'nearest_gt_count'
             
             newfeat.setAttributes(new_attributes)          
 
