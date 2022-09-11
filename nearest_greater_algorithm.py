@@ -50,6 +50,7 @@ from qgis.core import (QgsProcessing,
                        QgsGeometry,
                        QgsWkbTypes,
                        QgsProcessingParameterBoolean,
+                       QgsProcessingParameterEnum,
                        NULL)
 
 class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
@@ -101,16 +102,20 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
                 self.INPUT))
 
 
-        # Choose a number for the distance used for the feature
-        # with the greatest value. Can be NULL or any number.
-        param = QgsProcessingParameterNumber(
+        # Set how distance for the feature with
+        # the greatest value should be handled
+        self.distoptions = ['NULL',
+                            self.tr('1 Mio.'),
+                            self.tr('max distance + 1')]
+
+        self.addParameter( 
+            QgsProcessingParameterEnum(
                 self.DIST_FOR_MAX, 
-                self.tr('Set a distance value for the greatest feature'),
-                QgsProcessingParameterNumber.Double,
-                1000000000)
-        param.setMetadata({'widget_wrapper': { 'decimals': 0 }})
-        param.setMinimum(0)
-        self.addParameter(param)
+                self.tr('Choose a distance value for the greatest feature'),
+                options=self.distoptions,
+                defaultValue='NULL'
+                ))
+          
       
         # Select the field of name or ID to identify nearest neighbor
         self.addParameter(
@@ -224,7 +229,8 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
             self.NAME_FIELD,
             context)
 
-        dist_for_max = self.parameterAsDouble(
+        # dist_for_max is the index of the options, range 0 to 2
+        dist_for_max = self.parameterAsEnum(
             parameters,
             self.DIST_FOR_MAX,
             context)
@@ -304,14 +310,13 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
             # Attributes for the greatest feature
             if f == last_feature:
                 nearest_name = f[name_field]
-                distance = dist_for_max
                 
-                if dist_for_max == 0:
-                    distance = NULL
+                if dist_for_max == 1:
+                    distance = 1000000.0
+                elif dist_for_max == 2:
+                    distance = max(dist_list) + 1
                 else:
-                    distance = dist_for_max
-
-
+                    distance = NULL
 
             else:
                 # Get the id of the nearest neighbor
