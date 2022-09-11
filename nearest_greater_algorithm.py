@@ -300,6 +300,13 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         # Give feedback about null values etc.
         count_null = source.featureCount() - len(sorted_features)
         feedback.pushInfo('{} of {} features have NULL as value and are ignored.'.format(count_null, source.featureCount()))
+        list_names = [f[name_field] for v, f in sorted_features]
+        if len(list_names) > len(set(list_names)):
+            feedback.pushWarning('WARNING: There are non unique names in the selected field, it might be better to use another field als ID.')
+        if NULL in list_names:
+            feedback.pushWarning('WARNING: There are NULL values in the selected field, it might be better to use another field als ID.')
+        
+            
 
         # The main loop      
 
