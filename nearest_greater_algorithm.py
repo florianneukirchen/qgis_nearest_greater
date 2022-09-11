@@ -267,13 +267,13 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
 
         # Create a list of (value, feature) tuples.
         # Since values might be stored in a string (e.g. in openstreetmap data)
-        # I try to convert the values to float.
+        # I try to convert strings values to float.
         try:
             sorted_features = [(float(f.attribute(compare_field)), f) for f in features]
         except ValueError:
             sorted_features = [(f.attribute(compare_field), f) for f in features]
             feedback.pushInfo(self.tr('Converting the field to floating point value failed.'))
-            feedback.pushWarning('WARNING: The fields will be compared as type: '.format(
+            feedback.pushWarning(self.tr('WARNING: The fields will be compared as type: {0}').format(
                 type(sorted_features[0][0]).__name__))    
         
         # Sort the Features by the value of the field
