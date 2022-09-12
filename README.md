@@ -18,7 +18,7 @@ Use cases:
 - Useful for spatial analysis or to categorize features in order to apply different styles (e.g. major and minor summits). 
 
 ## Changelog
-### Git
+### 0.2 (2022-09)
 - Return additional field 'nearest_gt_count' with a count of the incoming links (i.e. connecting lines from points with smaller value)
 - Better handling of the distance value for the feature with greatest value. Three options: "NULL", "1 Mio.", "max distance + 1".
 - Warn if the selected name field contains NULL or non-unique values
