@@ -19,10 +19,10 @@ Use cases:
 
 ## Changelog
 ### 0.3 (2022-09)
-- Fix a bug by changing the names of added fields to neargtdist, neargtname, neargtcount. Don't use underscore. Before, they were renamed by QGSIS when the layer was saved to a shapefile.
+- Fix a bug by changing the names of added fields to neargtdist, neargtname, neargtcount: Don't use underscore. Before, they were renamed by QGSIS when the layer was saved to a shapefile.
 
 ### 0.2 (2022-09)
-- Return additional field 'nearest_gt_count' with a count of the incoming links (i.e. connecting lines from points with smaller value)
+- Return additional field 'neargtcount' with a count of the incoming links (i.e. connecting lines from points with smaller value)
 - Better handling of the distance value for the feature with greatest value. Three options: "NULL", "1 Mio.", "max distance + 1".
 - Warn if the selected name field contains NULL or non-unique values
 - Add short help string
