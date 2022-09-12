@@ -10,8 +10,6 @@ Get name (or ID) of and distance to the nearest neighbour with greater value in 
 The main output is a points layer with added attributes 'nearest_gt_dist', 'nearest_gt_name' and 'nearest_gt_count'. The field 'nearest_gt_count' 
 gives the value of incoming connecting lines linking to points with smaller value.
 Also returns a lines layer with connecting lines, as well as basic statistics of the distances (min, max, mean, quartiles). 
-The distance to be returned for the feature with the greatest value can be set, 
-it should be 0 (replaced by NULL in the output) or a very large number.
 
 Use cases: 
 - Which is the next larger city? 
@@ -24,6 +22,7 @@ Use cases:
 - Return additional field 'nearest_gt_count' with a count of the incoming links (i.e. connecting lines from points with smaller value)
 - Better handling of the distance value for the feature with greatest value. Three options: "NULL", "1 Mio.", "max distance + 1".
 - Warn if the selected name field contains NULL or non-unique values
+- Add short help string
 
 ### 0.1 (2022-09)
 - Initial release

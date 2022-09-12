@@ -61,8 +61,6 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
     The main output is a points layer with added attributes nearest_gt_dist, nearest_gt_name and nearest_gt_count.
     The field nearest_gt_count gives the value of incoming connecting lines linking to points with smaller value.
     Also returns a lines layer with connecting lines, as well as basic statistics of the distances (min, max, mean, quartiles).
-    The distance to be returned for the feature with the greatest value can be set, 
-    it should be 0 (replaced by NULL in the output) or a very large number.
     """
 
     # Constants used to refer to parameters and outputs. They will be
@@ -469,8 +467,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
              The main output is a points layer with added attributes nearest_gt_dist, nearest_gt_name and nearest_gt_count.
              The field nearest_gt_count gives the value of incoming connecting lines linking to points with smaller value.
              Also returns a lines layer with connecting lines, as well as basic statistics of the distances (min, max, mean, quartiles).
-             The distance to be returned for the feature with the greatest value can be set, 
-             it should be 0 (replaced by NULL in the output) or a very large number.	
+             For the distance that will be returned for the point with largest value, you can choose NULL, 1000000 or the max distance + 1.
              """
 		
         return self.tr(h)
