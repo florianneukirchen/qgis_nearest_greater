@@ -58,8 +58,8 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
     Get name (or ID) of and distance to the nearest feature with greater value in a certain field of a point layer.
     
     Get name (or ID) of and distance to the nearest neighbour with greater value in a certain field. Input is a points layer. 
-    The main output is a points layer with added attributes nearest_gt_dist, nearest_gt_name and nearest_gt_count.
-    The field nearest_gt_count gives the value of incoming connecting lines linking to points with smaller value.
+    The main output is a points layer with added attributes neargtdist, neargtname and neargtcount.
+    The field neargtcount gives the value of incoming connecting lines linking to points with smaller value.
     Also returns a lines layer with connecting lines, as well as basic statistics of the distances (min, max, mean, quartiles).
     """
 
@@ -242,9 +242,9 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
             
         # Define fields
         out_fields = source.fields()
-        out_fields.append(QgsField('nearest_gt_dist', QVariant.Double))
-        out_fields.append(QgsField('nearest_gt_name', QVariant.String))
-        out_fields.append(QgsField('nearest_gt_count', QVariant.Int))
+        out_fields.append(QgsField('neargtdist', QVariant.Double))
+        out_fields.append(QgsField('neargtname', QVariant.String))
+        out_fields.append(QgsField('neargtcount', QVariant.Int))
 
         # Get the sinks for output
         (sink, dest_id) = self.parameterAsSink(parameters, self.OUTPUT,
@@ -348,9 +348,9 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
             newfeat.setGeometry(f.geometry())
   
             new_attributes = f.attributes()
-            new_attributes.append(distance) # Field 'nearest_gt_dist'
-            new_attributes.append(nearest_name) # Field 'nearest_gt_name'
-            new_attributes.append(nearest_id_list.count(f.id())) # Field 'nearest_gt_count'
+            new_attributes.append(distance) # Field 'neargtdist'
+            new_attributes.append(nearest_name) # Field 'neargtname'
+            new_attributes.append(nearest_id_list.count(f.id())) # Field 'neargtcount'
             
             newfeat.setAttributes(new_attributes)          
 
@@ -388,8 +388,8 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
                 newfeat.setGeometry(f.geometry())
   
                 new_attributes = f.attributes()
-                new_attributes.append(NULL) # Field 'nearest_gt_dist'
-                new_attributes.append(NULL) # Field 'nearest_gt_name'
+                new_attributes.append(NULL) # Field 'neargtdist'
+                new_attributes.append(NULL) # Field 'neargtname'
             
                 newfeat.setAttributes(new_attributes)          
             
@@ -464,8 +464,8 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
       
         h =  """
              Get name (or ID) of and distance to the nearest neighbour with greater value in a certain field. Input is a points layer. 
-             The main output is a points layer with added attributes nearest_gt_dist, nearest_gt_name and nearest_gt_count.
-             The field nearest_gt_count gives the value of incoming connecting lines linking to points with smaller value.
+             The main output is a points layer with added attributes neargtdist, neargtname and neargtcount.
+             The field neargtcount gives the value of incoming connecting lines linking to points with smaller value.
              Also returns a lines layer with connecting lines, as well as basic statistics of the distances (min, max, mean, quartiles).
              For the distance that will be returned for the point with largest value, you can choose NULL, 1000000 or the max distance + 1.
              """
