@@ -9,7 +9,7 @@ name=Nearest with greater value
 qgisMinimumVersion=3.0
 description=Get name (or ID) of and distance to the nearest feature with greater value in a certain field of a point layer.
             Returns point layer with added attributes and a line layer with connecting lines.
-version=0.1
+version=0.2
 author=Florian Neukirchen
 email=mail@riannek.de
 
@@ -35,7 +35,6 @@ changelog=0.2
     - Return additional field 'nearest_gt_count' with a count of the incoming links (i.e. connecting lines from points with smaller value)
     - Better handling of the distance value for the feature with greatest value. Three options: "NULL", "1 Mio.", "max distance + 1".
     - Warn if the selected name field contains NULL or non-unique values
-    - Mark more strings for translation
     0.1 (2022-09)
     - Initial version
 
