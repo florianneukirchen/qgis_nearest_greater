@@ -7,7 +7,8 @@ QGIS Plugin to get name (or ID) of and distance to the nearest feature with grea
 
 ## About
 Get name (or ID) of and distance to the nearest neighbour with greater value in a certain field. Input is a points layer. 
-The main output is a points layer with added attributes 'nearest_gt_dist' and 'nearest_gt_name'.
+The main output is a points layer with added attributes 'nearest_gt_dist', 'nearest_gt_name' and 'nearest_gt_count'. The field 'nearest_gt_count' 
+gives the value of incoming connecting lines linking to points with smaller value.
 Also returns a lines layer with connecting lines, as well as basic statistics of the distances (min, max, mean, quartiles). 
 The distance to be returned for the feature with the greatest value can be set, 
 it should be 0 (replaced by NULL in the output) or a very large number.
@@ -15,7 +16,8 @@ it should be 0 (replaced by NULL in the output) or a very large number.
 Use cases: 
 - Which is the next larger city? 
 - Which is the closest peak with higher elevation? 
-- Useful for spatial analysis or to categorize features in order to apply different styles (e.g. major and minor summits). 
+- Useful for spatial analysis 
+- Useful to categorize features in order to apply different styles (e.g. major and minor summits). 
 
 ## Changelog
 ### 0.2 (2022-09)
