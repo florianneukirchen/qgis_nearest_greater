@@ -58,7 +58,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
     Get name (or ID) of and distance to the nearest feature with greater value in a certain field of a point layer.
     
     Get name (or ID) of and distance to the nearest neighbour with greater value in a certain field. Input is a points layer. 
-    The main output is a points layer with added attributes neargtdist, neargtname and neargtcount.
+    The main output is a points layer with added attributes neargtdist, neargtdelta, neargtname and neargtcount.
     The field neargtcount gives the value of incoming connecting lines linking to points with smaller value.
     Also returns a lines layer with connecting lines, as well as basic statistics of the distances (min, max, mean, quartiles).
     """
@@ -153,6 +153,43 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
 
         self.addOutput(
             QgsProcessingOutputNumber(
+                'MIN_DELTA',
+                self.tr('Smallest delta.')
+            ))  
+
+        self.addOutput(
+            QgsProcessingOutputNumber(
+                'MAX_DELTA',
+                self.tr('Largest calculated delta.')
+            ))  
+
+        self.addOutput(
+            QgsProcessingOutputNumber(
+                'MEAN_DELTA',
+                self.tr('Mean of calculated delta.')
+            ))  
+
+        self.addOutput(
+            QgsProcessingOutputNumber(
+                'Q1_DELTA',
+                self.tr('First quartile of delta.')
+            ))  
+
+        self.addOutput(
+            QgsProcessingOutputNumber(
+                'Q2_DELTA',
+                self.tr('Second quartile (median) of delta.')
+            ))  
+
+        self.addOutput(
+            QgsProcessingOutputNumber(
+                'Q3_DELTA',
+                self.tr('Third quartile of delta.')
+            ))  
+
+
+        self.addOutput(
+            QgsProcessingOutputNumber(
                 'MIN_DIST',
                 self.tr('Smallest distance.')
             ))  
@@ -242,6 +279,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         # Define fields
         out_fields = source.fields()
         out_fields.append(QgsField('neargtdist', QVariant.Double))
+        out_fields.append(QgsField('neargtdelta', QVariant.Double))
         out_fields.append(QgsField('neargtname', QVariant.String))
         out_fields.append(QgsField('neargtcount', QVariant.Int))
 
@@ -265,7 +303,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
 
         # Create a list of (value, feature) tuples.
         # Since values might be stored in a string (e.g. in openstreetmap data)
-        # I try to convert strings values to float.
+        # I try to convert values to float.
         try:
             sorted_features = [(float(f.attribute(compare_field)), f) for f in features]
         except ValueError:
@@ -277,11 +315,12 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         # Sort the Features by the value of the field
         sorted_features.sort(key=lambda x: x[0])
 
-        # Algorithm does not work with the last one (greatest value) 
+        # The last one (with greatest value) 
         last_feature = sorted_features[-1][1]
 
-        # A list of the calculated distances, to get some stats
+        # Lists of the calculated distances and deltas, to get some stats
         dist_list = []
+        delta_list = []
         
         # A list of the ids of nearest features for the count
         nearest_id_list = []
@@ -300,9 +339,9 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         feedback.pushInfo(self.tr('{0} of {1} features have NULL as value and are ignored.').format(count_null, source.featureCount()))
         list_names = [f[name_field] for v, f in sorted_features]
         if len(list_names) > len(set(list_names)):
-            feedback.pushWarning(self.tr('WARNING: There are non unique names in the selected field, it might be better to use another field als ID.'))
+            feedback.pushWarning(self.tr('WARNING: There are non unique names in the selected ID/name field, it might be better to use another field.'))
         if NULL in list_names:
-            feedback.pushWarning(self.tr('WARNING: There are NULL values in the selected field, it might be better to use another field als ID.'))
+            feedback.pushWarning(self.tr('WARNING: There are NULL values in the selected ID/name field, it might be better to use another field.'))
         
             
 
@@ -314,6 +353,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
                 break
             # Attributes for the greatest feature
             if f == last_feature:
+                delta = 0
                 nearest_name = f[name_field]
                 
                 if dist_for_max == 1:
@@ -332,6 +372,11 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
                 nearest_id_list.append(nearest_id)
                 nearest_name = feat_by_id[nearest_id][name_field]
                 nearest_geom = feat_by_id[nearest_id].geometry().asPoint()
+                try:
+                    delta = float(feat_by_id[nearest_id][compare_field]) - value
+                except ValueError:
+                    delta = 0
+                delta_list.append(delta)
                 distance = f.geometry().asPoint().distance(nearest_geom)
                 dist_list.append(distance)
                                
@@ -348,6 +393,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
   
             new_attributes = f.attributes()
             new_attributes.append(distance) # Field 'neargtdist'
+            new_attributes.append(delta) # Field 'neargtdelta'
             new_attributes.append(nearest_name) # Field 'neargtname'
             new_attributes.append(nearest_id_list.count(f.id())) # Field 'neargtcount'
             
@@ -388,6 +434,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
   
                 new_attributes = f.attributes()
                 new_attributes.append(NULL) # Field 'neargtdist'
+                new_attributes.append(NULL) # Field 'neargtdelta'
                 new_attributes.append(NULL) # Field 'neargtname'
             
                 newfeat.setAttributes(new_attributes)          
@@ -398,25 +445,35 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
                 current = current + 1
 
         # Calculate some statistics
+        feedback.pushInfo(self.tr('\nCalculate statistics:'))
+        min_delta = min(delta_list)
+        max_delta = max(delta_list)
+        mean_delta = mean(delta_list)
+        quantiles_delta = quantiles(delta_list)
+
+        feedback.pushInfo(self.tr('\nDelta:'))
+        feedback.pushInfo('MIN:    {}'.format(min_delta))        
+        feedback.pushInfo('MAX:    {}'.format(max_delta))         
+        feedback.pushInfo('MEAN:   {}'.format(mean_delta))       
+        feedback.pushInfo('Q1:     {}'.format(quantiles_delta[0])) 
+        feedback.pushInfo('MEDIAN: {}'.format(quantiles_delta[1])) 
+        feedback.pushInfo('Q3:     {}'.format(quantiles_delta[2])) 
+
         min_dist = min(dist_list)
         max_dist = max(dist_list)
         mean_dist = mean(dist_list)
         quantiles_dist = quantiles(dist_list)
 
-        feedback.pushInfo(self.tr('Distance Statistics:'))
+        feedback.pushInfo(self.tr('\nDistance:'))
         feedback.pushInfo('MIN:    {}'.format(min_dist))        
         feedback.pushInfo('MAX:    {}'.format(max_dist))         
         feedback.pushInfo('MEAN:   {}'.format(mean_dist))       
         feedback.pushInfo('Q1:     {}'.format(quantiles_dist[0])) 
         feedback.pushInfo('MEDIAN: {}'.format(quantiles_dist[1])) 
-        feedback.pushInfo('Q3:     {}'.format(quantiles_dist[2])) 
+        feedback.pushInfo('Q3:     {}\n'.format(quantiles_dist[2])) 
 
-        # Return the results of the algorithm. In this case our only result is
-        # the feature sink which contains the processed features, but some
-        # algorithms may return multiple feature sinks, calculated numeric
-        # statistics, etc. These should all be included in the returned
-        # dictionary, with keys matching the feature corresponding parameter
-        # or output names.
+        # Return the results of the algorithm.
+        
         if feedback.isCanceled():
             return {}
 
@@ -425,6 +482,12 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
                 'ID_MAX_VALUE': last_feature.id(),
                 'NUMBER_PROCESSED_FEATURES':len(sorted_features),
                 'NUMBER_IGNORED_FEATURES':count_null,
+                'MIN_DELTA':min_delta,
+                'MAX_DELTA':max_delta,
+                'MEAN_DELTA':mean_delta,
+                'Q1_DELTA':quantiles_delta[0],
+                'Q2_DELTA':quantiles_delta[1],                
+                'Q3_DELTA':quantiles_delta[2],
                 'MIN_DIST':min_dist,
                 'MAX_DIST':max_dist,
                 'MEAN_DIST':mean_dist,
@@ -463,8 +526,8 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
       
         h =  """
              Get name (or ID) of and distance to the nearest neighbour with greater value in a certain field. Input is a points layer. 
-             The main output is a points layer with added attributes neargtdist, neargtname and neargtcount.
-             The field neargtcount gives the value of incoming connecting lines linking to points with smaller value.
+             The main output is a points layer with added attributes neargtdist (distance), neargtdelta (difference of both values), neargtname and neargtcount.
+             The field neargtcount gives the count of incoming connecting lines linking to points with smaller value.
              Also returns a lines layer with connecting lines, as well as basic statistics of the distances (min, max, mean, quartiles).
              For the distance that will be returned for the point with largest value, you can choose NULL, 1000000 or the max distance + 1.
              """
