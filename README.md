@@ -18,6 +18,12 @@ Use cases:
 - Useful to categorize features in order to apply different styles (e.g. major and minor summits). 
 
 ## Changelog
+
+### Main branch
+- Add one more field neargtdelta with the diffence of both values
+- Calculate statistics for delta
+- Improve strings in the UI
+
 ### 0.3 (2022-09)
 - Fix a bug by changing the names of added fields to neargtdist, neargtname, neargtcount: Don't use underscore. Before, they were renamed by QGSIS when the layer was saved to a shapefile.
 
