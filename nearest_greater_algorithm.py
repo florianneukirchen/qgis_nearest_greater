@@ -82,8 +82,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         with some other properties.
         """
 
-        # We add the input vector features source. It can have any kind of
-        # geometry.
+        # We add the input vector features source. 
         self.addParameter(
             QgsProcessingParameterFeatureSource(
                 self.INPUT,
@@ -120,7 +119,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterField(
                 self.NAME_FIELD,
-                self.tr('Identify nearest greater neighbor by field'),
+                self.tr('Name or ID to identify nearest greater neighbor'),
                 '',
                 self.INPUT))
 
