@@ -10,7 +10,7 @@ QGIS Plugin to get name (or ID) of and distance to the nearest feature with grea
 ## About
 Get name (or ID) of and distance to the nearest neighbour with greater value in a certain field. Input is a points layer. 
 The main output is a points layer with added attributes 'neargtdist' (distance), 'neargtdelta' (difference of both values), 'neargtname' (name/ID) and 'neargtcount'. The field 'neargtcount' 
-gives the value of incoming connecting lines linking to points with smaller value.
+gives the count of incoming connecting lines linking to points with smaller value.
 Also returns a lines layer with connecting lines, as well as basic statistics of the distances (min, max, mean, quartiles). 
 
 Use cases: 
