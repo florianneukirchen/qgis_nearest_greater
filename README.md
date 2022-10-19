@@ -22,8 +22,8 @@ Use cases:
 
 ## Changelog
 
-### Main branch
-- Add one more field neargtdelta with the diffence of both values
+### 1.0 (2022-10)
+- Add additional output field neargtdelta with the diffence of both values
 - Calculate statistics for delta
 - Improve strings in the UI
 
