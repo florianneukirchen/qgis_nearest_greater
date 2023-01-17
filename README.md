@@ -22,6 +22,9 @@ Use cases:
 
 ## Changelog
 
+### 1.1 (2023-01)
+- Set QGIS minimum version to 3.18 (requires pyproj >= 3.0.0)
+
 ### 1.0 (2022-10)
 - Add additional output field neargtdelta with the diffence of both values
 - Calculate statistics for delta

@@ -6,10 +6,10 @@
 
 [general]
 name=Nearest with greater value
-qgisMinimumVersion=3.0
+qgisMinimumVersion=3.18
 description=Get name (or ID) of and distance to the nearest feature with greater value in a certain field of a point layer.
             Returns point layer with added attributes and a line layer with connecting lines.
-version=1.0
+version=1.1
 author=Florian Neukirchen
 email=mail@riannek.de
 
@@ -30,7 +30,9 @@ repository=https://github.com/florianneukirchen/qgis_nearest_greater
 hasProcessingProvider=yes
 # Uncomment the following line and add your changelog:
 
-changelog=1.0
+changelog=1.1
+    - Set QGIS minimum version to 3.18 (requires pyproj >= 3.0.0)
+    1.0
     - Add additional output field neargtdelta with the diffence of both values
     - Calculate statistics for delta
     - Improve strings in the UI
