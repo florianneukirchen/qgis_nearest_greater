@@ -31,7 +31,7 @@ hasProcessingProvider=yes
 # Uncomment the following line and add your changelog:
 
 changelog=1.1
-    - Set QGIS minimum version to 3.18 (requires pyproj >= 3.0.0)
+    - Set QGIS minimum version to 3.18 
     1.0
     - Add additional output field neargtdelta with the diffence of both values
     - Calculate statistics for delta
