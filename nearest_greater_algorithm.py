@@ -51,6 +51,9 @@ from qgis.core import (QgsProcessing,
                        QgsWkbTypes,
                        QgsProcessingParameterBoolean,
                        QgsProcessingParameterEnum,
+                       QgsDistanceArea,
+                       QgsCoordinateReferenceSystem,
+                       QgsCoordinateTransformContext,
                        NULL)
 
 class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
@@ -74,6 +77,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
     LINEOUTPUT = 'LINEOUTPUT'
     KEEP = 'KEEP'
     NAME_FIELD = 'NAME_FIELD'
+    ELLIPSOIDAL = 'ELLIPSOIDAL'
 
 
     def initAlgorithm(self, config):
@@ -99,19 +103,20 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
                 '',
                 self.INPUT))
 
-
         # Set how distance for the feature with
         # the greatest value should be handled
         self.distoptions = ['NULL',
                             self.tr('1 Mio.'),
                             self.tr('max distance + 1')]
 
+
+
         self.addParameter( 
             QgsProcessingParameterEnum(
                 self.DIST_FOR_MAX, 
                 self.tr('Choose a distance value for the greatest feature'),
                 options=self.distoptions,
-                defaultValue='NULL'
+                defaultValue=0
                 ))
           
       
@@ -123,6 +128,14 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
                 '',
                 self.INPUT))
 
+        # Select method to calculate distance (projected or ellipsoid WGS84)
+        self.addParameter(
+            QgsProcessingParameterBoolean(
+                self.ELLIPSOIDAL,
+                self.tr('Calculate distance (m) on ellipsoid (WGS84)'),
+                True
+            )
+        )
 
         # Should features with NULL value be added to the output layer?
         self.addParameter(
@@ -275,6 +288,12 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
             self.KEEP,
             context)
 
+        ellipsoidal = self.parameterAsBoolean(
+            parameters,
+            self.ELLIPSOIDAL,
+            context
+        )
+
             
         # Define fields
         out_fields = source.fields()
@@ -290,8 +309,8 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         (linesink, line_dest_id) = self.parameterAsSink(parameters, self.LINEOUTPUT,
                 context, out_fields, QgsWkbTypes.LineString, source.sourceCrs())
 
-        if source.sourceCrs().isGeographic():
-            feedback.pushWarning(self.tr('WARNING: The input is in a geographic CRS. Consider using a projected CRS.'))
+        if source.sourceCrs().isGeographic() and not ellipsoidal:
+            feedback.pushWarning(self.tr('WARNING: The input is in a geographic CRS and you choosed to calculate distance on projected plane. Consider to calculate distance on ellipsoid or a layer in projected CRS.'))
 
         # Compute the number of steps to display within the progress bar 
         total = 100.0 / source.featureCount() if source.featureCount() else 0
@@ -342,8 +361,18 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
             feedback.pushWarning(self.tr('WARNING: There are non unique names in the selected ID/name field, it might be better to use another field.'))
         if NULL in list_names:
             feedback.pushWarning(self.tr('WARNING: There are NULL values in the selected ID/name field, it might be better to use another field.'))
-        
-            
+
+        # Prepare QgsDistanceArea for ellipsoidal distance
+        if ellipsoidal:
+            d = QgsDistanceArea()
+            d.setEllipsoid('WGS84')
+            wgs84 = QgsCoordinateReferenceSystem(4326)
+            if source.sourceCrs() != wgs84:
+                trans_context = QgsCoordinateTransformContext()
+                trans_context.calculateDatumTransforms(source.sourceCrs(), wgs84)
+                d.setSourceCrs(source.sourceCrs(), trans_context)
+            feedback.pushInfo("Length unit: " + str(d.lengthUnits()))
+
 
         # The main loop      
 
@@ -377,7 +406,12 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
                 except ValueError:
                     delta = 0
                 delta_list.append(delta)
-                distance = f.geometry().asPoint().distance(nearest_geom)
+
+                # Calculate distance
+                if ellipsoidal:
+                    distance = d.measureLine(f.geometry().asPoint(), nearest_geom)
+                else:
+                    distance = f.geometry().asPoint().distance(nearest_geom)
                 dist_list.append(distance)
                                
 
@@ -526,10 +560,12 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
       
         h =  """
              Get name (or ID) of and distance to the nearest neighbour with greater value in a certain field. Input is a points layer. 
+             By default, distance (in meters) is calculated on the WGS84 ellipsoid. If the corresponding checkbox is not checked, the distance is calculated on the plane of the layer and distance unit is the unit of the layer crs.
              The main output is a points layer with added attributes neargtdist (distance), neargtdelta (difference of both values), neargtname and neargtcount.
              The field neargtcount gives the count of incoming connecting lines linking to points with smaller value.
              Also returns a lines layer with connecting lines, as well as basic statistics of the distances (min, max, mean, quartiles).
              For the distance that will be returned for the point with largest value, you can choose NULL, 1000000 or the max distance + 1.
+             Note: the plugin uses the spacial index of QGIS, which works on a plane, not on a globe. Some "nearest neighbors" might be incorrect if the correct nearest neighbor is on the other side of the datum line or one of the polar regions. 
              """
 		
         return self.tr(h)

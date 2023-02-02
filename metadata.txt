@@ -30,7 +30,9 @@ repository=https://github.com/florianneukirchen/qgis_nearest_greater
 hasProcessingProvider=yes
 # Uncomment the following line and add your changelog:
 
-changelog=1.1
+changelog=1.2
+    - By default, distance is now calculated on the WGS84 ellipsoid. The old behaviour (distance on the plane of the layer) is still available as an option. 
+    1.1
     - Set QGIS minimum version to 3.18 
     1.0
     - Add additional output field neargtdelta with the diffence of both values
