@@ -379,7 +379,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         for value, f in sorted_features:
             # Stop the algorithm if cancel button has been clicked
             if feedback.isCanceled():
-                break
+                return {}
             # Attributes for the greatest feature
             if f == last_feature:
                 delta = 0
@@ -460,7 +460,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
             # The loop is similar to the main loop
             for f in features:
                 if feedback.isCanceled():
-                    break
+                    return {}
               
                 newfeat = QgsFeature()
                 newfeat.setFields(out_fields)
