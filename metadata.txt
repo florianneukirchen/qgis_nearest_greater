@@ -32,6 +32,7 @@ hasProcessingProvider=yes
 
 changelog=1.2
     - By default, distance is now calculated on the WGS84 ellipsoid. The old behaviour (distance on the plane of the layer) is still available as an option. 
+    - Catch exception when comparing strings
     1.1
     - Set QGIS minimum version to 3.18 
     1.0

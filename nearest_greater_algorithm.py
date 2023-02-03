@@ -91,7 +91,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
             QgsProcessingParameterFeatureSource(
                 self.INPUT,
                 self.tr('Input layer'),
-                [QgsProcessing.TypeVectorPoint]
+                [QgsProcessing.TypeVector]
             )
         )
 
@@ -396,11 +396,11 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
                 # Get the id of the nearest neighbor
                 # Note: The returned list always includes f itself, 
                 # we need the second "neighbor".
-                nearest_id = index.nearestNeighbor(f.geometry().asPoint(), 2)[1]
+                nearest_id = index.nearestNeighbor(f.geometry().boundingBox().center(), 2)[1]
 
                 nearest_id_list.append(nearest_id)
                 nearest_name = feat_by_id[nearest_id][name_field]
-                nearest_geom = feat_by_id[nearest_id].geometry().asPoint()
+                nearest_geom = feat_by_id[nearest_id].geometry().boundingBox().center()
                 try:
                     delta = float(feat_by_id[nearest_id][compare_field]) - value
                 except (ValueError, TypeError):
@@ -409,9 +409,9 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
 
                 # Calculate distance
                 if ellipsoidal:
-                    distance = d.measureLine(f.geometry().asPoint(), nearest_geom)
+                    distance = d.measureLine(f.geometry().boundingBox().center(), nearest_geom)
                 else:
-                    distance = f.geometry().asPoint().distance(nearest_geom)
+                    distance = f.geometry().boundingBox().center().distance(nearest_geom)
                 dist_list.append(distance)
                                
 
@@ -438,7 +438,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
             
             # Create connecting lines in the line output layer
 
-            linegeom = QgsGeometry.fromPolylineXY([f.geometry().asPoint(), nearest_geom])                
+            linegeom = QgsGeometry.fromPolylineXY([f.geometry().boundingBox().center(), nearest_geom])                
             linefeat = QgsFeature()
             linefeat.setFields(out_fields)
             linefeat.setGeometry(linegeom)
