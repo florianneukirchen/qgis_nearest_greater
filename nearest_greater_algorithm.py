@@ -403,7 +403,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
                 nearest_geom = feat_by_id[nearest_id].geometry().asPoint()
                 try:
                     delta = float(feat_by_id[nearest_id][compare_field]) - value
-                except ValueError:
+                except (ValueError, TypeError):
                     delta = 0
                 delta_list.append(delta)
 

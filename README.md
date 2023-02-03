@@ -26,8 +26,9 @@ The plugin uses the spacial index of QGIS, which works on a plane, not on a glob
 
 ## Changelog
 
-### 2.0 (???)
+### 1.2 (???)
 - By default, distance (in meters) is now calculated on the WGS84 ellipsoid. The old behaviour (distance on the plane of the layer) is still available as an option. 
+- Catch exception when comparing strings
 
 ### 1.1 (2023-01)
 - Set QGIS minimum version to 3.18 
