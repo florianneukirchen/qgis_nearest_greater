@@ -325,9 +325,10 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         # I try to convert values to float.
         try:
             sorted_features = [(float(f.attribute(compare_field)), f) for f in features]
-        except ValueError:
+        except ValueError as e:
+            feedback.pushWarning(self.tr(f'Error: Converting the field to floating point value failed with Value Error: {e.args[0]}\n'))
+
             sorted_features = [(f.attribute(compare_field), f) for f in features]
-            feedback.pushInfo(self.tr('Converting the field to floating point value failed.'))
             feedback.pushWarning(self.tr('WARNING: The fields will be compared as type: {0}').format(
                 type(sorted_features[0][0]).__name__))    
         
@@ -371,8 +372,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
                 trans_context = QgsCoordinateTransformContext()
                 trans_context.calculateDatumTransforms(source.sourceCrs(), wgs84)
                 d.setSourceCrs(source.sourceCrs(), trans_context)
-            feedback.pushInfo("Length unit: " + str(d.lengthUnits()))
-
+           
 
         # The main loop      
 
