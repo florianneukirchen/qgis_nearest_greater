@@ -14,7 +14,7 @@ author=Florian Neukirchen
 email=mail@riannek.de
 
 about=For each feature on a vector layer, get name (or ID) of and distance to the nearest neighbour with greater value in a certain field. On line or polygon layers, distance is calculated between the center points of the bounding boxes. Since version 2.0, distance is calculated on the WGS84 ellipsoid (not on the layer plane) by default.
-    The main output is a points layer with added attributes neargtdist (distance), neargtdelta (difference in value), neargtname (name or ID), neargtcount. Note that the features are sorted from lowest to greatest value of the field that was used to compare values.
+    The main output is a layer with added attributes neargtdist (distance), neargtdelta (difference in value), neargtname (name or ID), neargtcount. Note that the features are sorted from lowest to greatest value of the field that was used to compare values.
     The field neargtcount gives the value of incoming connecting lines linking to points with smaller value.
     Also returns a lines layer with connecting lines, as well as basic statistics of the distances and deltas (min, max, mean, quantiles).
     Use cases: Which is the next larger city? How far is the next higher building? Which is the closest peak with higher elevation? 
