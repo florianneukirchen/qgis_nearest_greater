@@ -559,13 +559,13 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
     def shortHelpString(self):
       
         h =  """
-             Get name (or ID) of and distance to the nearest neighbour with greater value in a certain field. Input is a points layer. 
-             By default, distance (in meters) is calculated on the WGS84 ellipsoid. If the corresponding checkbox is not checked, the distance is calculated on the plane of the layer and distance unit is the unit of the layer crs.
-             The main output is a points layer with added attributes neargtdist (distance), neargtdelta (difference of both values), neargtname and neargtcount.
+             Get name (or ID) of and distance to the nearest neighbour with greater value in a certain field. Input is a vector layer. On line or polygon layers, distance is calculated between the center points of the bounding boxes.
+             By default, distance (in meters) is calculated on the WGS84 ellipsoid. If the corresponding checkbox is not checked, the distance is calculated on the plane of the layer and distance unit is the unit of the layer CRS.
+             The main output is a points layer with added attributes neargtdist (distance), neargtdelta (difference of both values), neargtname and neargtcount. Note that the features are sorted from lowest to greatest value of the field that was used to compare values.
              The field neargtcount gives the count of incoming connecting lines linking to points with smaller value.
              Also returns a lines layer with connecting lines, as well as basic statistics of the distances (min, max, mean, quartiles).
              For the distance that will be returned for the point with largest value, you can choose NULL, 1000000 or the max distance + 1.
-             Note: the plugin uses the spacial index of QGIS, which works on a plane, not on a globe. Some "nearest neighbors" might be incorrect if the correct nearest neighbor is on the other side of the datum line or one of the polar regions. 
+             Note: the plugin uses the spacial index of QGIS, which works on a plane, not on a globe. Some "nearest neighbors" might be incorrect if the correct nearest neighbor is on the other side of the datum line or one of the polar regions.  
              """
 		
         return self.tr(h)

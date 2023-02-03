@@ -1,5 +1,5 @@
-# qgis_nearest_greater
-QGIS Plugin to get name (or ID) of and distance to the nearest feature with greater value in a certain field of a point layer.
+# QGIS plugin nearest greater 
+QGIS plugin to get name (or ID) of and distance to the nearest feature with greater value in a certain field; for every feature of a vector layer.
 
 - Homepage: [https://www.riannek.de/code/qgis-nearest-with-greater/](https://www.riannek.de/code/qgis-nearest-with-greater/)
 - Sourcecode: [https://github.com/florianneukirchen/qgis_nearest_greater](https://github.com/florianneukirchen/qgis_nearest_greater)
@@ -7,12 +7,14 @@ QGIS Plugin to get name (or ID) of and distance to the nearest feature with grea
 - Bug Tracker: https://github.com/florianneukirchen/qgis_nearest_greater/issues
 
 
-## About
-Get name (or ID) of and distance to the nearest neighbour *with greater value* in a certain attribute field. Input is a points layer. 
-The main output is a points layer with added attributes 'neargtdist' (distance in meters), 'neargtdelta' (difference of both input values), 'neargtname' (name or ID) and 'neargtcount'. The field 'neargtcount' gives the count of incoming connecting lines linking to points with smaller value.
-Also returns a lines layer with connecting lines, as well as basic statistics of the distances (min, max, mean, quartiles). 
+![QGIS neareast greater plugin](help/nearestgreater.png)
 
-Since version 2.0, distance is calculated on the WGS84 ellipsoid (not on the layer plane) by default. 
+## About
+For each feature on a vector layer, get name (or ID) of and distance to the nearest neighbour *with greater value* in a certain attribute field. On line or polygon layers, distance is calculated between the center points of the bounding boxes. Since version 2.0, distance is calculated on the WGS84 ellipsoid (not on the layer plane) by default. If the corresponding checkbox is not checked, the distance is calculated on the plane of the layer and distance unit is the unit of the layer CRS.
+
+The main output is a points layer with added attributes 'neargtdist' (distance in meters), 'neargtdelta' (difference of both input values), 'neargtname' (name or ID) and 'neargtcount'. The field 'neargtcount' gives the count of incoming connecting lines linking to points with smaller value. Note that the features are sorted from lowest to greatest value of the field that was used to compare values.
+
+Also returns a lines layer with connecting lines, as well as basic statistics of the distances (min, max, mean, quartiles). 
 
 Use cases: 
 - Which is the next larger city? 
@@ -26,9 +28,10 @@ The plugin uses the spacial index of QGIS, which works on a plane, not on a glob
 
 ## Changelog
 
-### 1.2 (???)
-- By default, distance (in meters) is now calculated on the WGS84 ellipsoid. The old behaviour (distance on the plane of the layer) is still available as an option. 
-- Catch exception when comparing strings
+### 2.0 (2023-02)
+- Take any geometry as input, not only point layers. The distance is calculated from the centers of the bounding boxes. This also fixes a bug that caused an exception with Multipoint geometries.
+- By default, distance is now calculated on the WGS84 ellipsoid. The old behaviour (distance on the plane of the layer) is still available as an option. 
+- Bugfix: Catch exception when comparing strings and trying to calculate delta.
 
 ### 1.1 (2023-01)
 - Set QGIS minimum version to 3.18 
