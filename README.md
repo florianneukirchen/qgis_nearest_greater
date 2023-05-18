@@ -3,8 +3,8 @@ QGIS plugin to get name (or ID) of and distance to the nearest feature with grea
 
 - Homepage: [https://www.riannek.de/code/qgis-nearest-with-greater/](https://www.riannek.de/code/qgis-nearest-with-greater/)
 - Sourcecode: [https://github.com/florianneukirchen/qgis_nearest_greater](https://github.com/florianneukirchen/qgis_nearest_greater)
-- QGIS Plugin Repository: https://plugins.qgis.org/plugins/qgis_nearest_greater/
-- Bug Tracker: https://github.com/florianneukirchen/qgis_nearest_greater/issues
+- QGIS Plugin Repository: [https://plugins.qgis.org/plugins/qgis_nearest_greater/](https://plugins.qgis.org/plugins/qgis_nearest_greater/)
+- Bug Tracker: [https://github.com/florianneukirchen/qgis_nearest_greater/issues](https://github.com/florianneukirchen/qgis_nearest_greater/issues)
 
 
 ![QGIS neareast greater plugin](help/nearestgreater.png)
@@ -29,7 +29,7 @@ The plugin uses the spacial index of QGIS to find nearest neighbours, which work
 ## Changelog
 
 ### 2.0 (2023-02)
-- Take any geometry as input, not only point layers. The distance is calculated from the centers of the bounding boxes. This also fixes a bug that caused an exception with Multipoint geometries.
+- Take any geometry as input, not only point layers. The distance is now calculated from the centers of the bounding boxes. This also fixes a bug that caused an exception with Multipoint geometries.
 - By default, distance is now calculated on the WGS84 ellipsoid. The old behaviour (distance on the plane of the layer) is still available as an option. 
 - Bugfix: Catch exception when comparing strings and trying to calculate delta.
 

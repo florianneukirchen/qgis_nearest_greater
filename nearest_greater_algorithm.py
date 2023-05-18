@@ -107,7 +107,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         # the greatest value should be handled
         self.distoptions = ['NULL',
                             self.tr('1 Mio.'),
-                            self.tr('max distance + 1')]
+                            self.tr('Max distance + 1')]
 
 
 
