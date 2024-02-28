@@ -24,7 +24,7 @@ Use cases:
 - Useful to categorize features in order to apply different styles (e.g. major and minor summits). 
 
 ## Limitations
-The plugin uses the spacial index of QGIS to find nearest neighbours, which works on a plane, not on a globe. Some "nearest neighbours" might be incorrect if the correct nearest neighbour is on the other side of the datum line or one of the polar regions. However, this is only problematic if you are working with global data. 
+The plugin uses the spatial index of QGIS to find nearest neighbours, which works on a plane, not on a globe. Some "nearest neighbours" might be incorrect if the correct nearest neighbour is on the other side of the datum line or one of the polar regions. However, this is only problematic if you are working with global data. 
 
 ## Changelog
 
