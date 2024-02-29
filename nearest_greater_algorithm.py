@@ -31,8 +31,9 @@ __copyright__ = '(C) 2022 by Florian Neukirchen'
 
 __revision__ = '$Format:%H$'
 
+import os
 from statistics import quantiles, mean
-from qgis.PyQt.QtCore import QCoreApplication, QVariant, NULL
+from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, QVariant, NULL
 from qgis.core import (QgsProcessing,
                        QgsFeatureSink,
                        QgsProcessingAlgorithm,
@@ -79,6 +80,21 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
     NAME_FIELD = 'NAME_FIELD'
     ELLIPSOIDAL = 'ELLIPSOIDAL'
 
+
+    # def __init__(self):
+    #     # Init translation
+    #     plugin_dir = os.path.dirname(__file__)
+    #     locale = QSettings().value('locale/userLocale')[0:2]
+    #     locale_path = os.path.join(
+    #         plugin_dir,
+    #         'i18n',
+    #         'nearest_greater_{}.qm'.format(locale))
+
+    #     if os.path.exists(locale_path):
+    #         self.translator = QTranslator()
+    #         self.translator.load(locale_path)
+    #         QCoreApplication.installTranslator(self.translator)
+    #     super().__init__()
 
     def initAlgorithm(self, config):
         """
@@ -571,7 +587,8 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         return self.tr(h)
 
     def tr(self, string):
-        return QCoreApplication.translate('Processing', string)
+        return QCoreApplication.translate('NearestGreater', string)
+        # return QCoreApplication.translate('Processing', string)
 
     def createInstance(self):
         return NearestGreaterAlgorithm()
