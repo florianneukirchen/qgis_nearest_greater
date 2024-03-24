@@ -28,6 +28,10 @@ The plugin uses the spatial index of QGIS to find nearest neighbours, which work
 
 ## Changelog
 
+## Git main
+- Get translation working
+- Add German translation
+
 ### 2.0 (2023-02)
 - Take any geometry as input, not only point layers. The distance is now calculated from the centers of the bounding boxes. This also fixes a bug that caused an exception with Multipoint geometries.
 - By default, distance is now calculated on the WGS84 ellipsoid. The old behaviour (distance on the plane of the layer) is still available as an option. 
@@ -42,7 +46,7 @@ The plugin uses the spatial index of QGIS to find nearest neighbours, which work
 - Improve strings in the UI
 
 ### 0.3 (2022-09)
-- Fix a bug by changing the names of added fields to neargtdist, neargtname, neargtcount: Don't use underscore. Before, they were renamed by QGSIS when the layer was saved to a shapefile.
+- Fix a bug by changing the names of added fields to neargtdist, neargtname, neargtcount: Don't use underscore. Before, they were renamed by QGIS when the layer was saved to a shapefile.
 
 ### 0.2 (2022-09)
 - Return additional field 'neargtcount' with a count of the incoming links (i.e. connecting lines from points with smaller value)
