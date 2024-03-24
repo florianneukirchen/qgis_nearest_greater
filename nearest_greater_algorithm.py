@@ -170,14 +170,14 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         self.addOutput(
             QgsProcessingOutputNumber(
                 'NUMBER_PROCESSED_FEATURES',
-                self.tr('Number of features that have been processed.')
+                self.tr('Number of features that have been processed')
             ))   
 
 
         self.addOutput(
             QgsProcessingOutputNumber(
                 'NUMBER_IGNORED_FEATURES',
-                self.tr('Number of ignored features with NULL values.')
+                self.tr('Number of ignored features with NULL values')
             ))   
 
         self.addOutput(
@@ -189,68 +189,68 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         self.addOutput(
             QgsProcessingOutputNumber(
                 'MAX_DELTA',
-                self.tr('Largest calculated delta.')
+                self.tr('Largest calculated delta')
             ))  
 
         self.addOutput(
             QgsProcessingOutputNumber(
                 'MEAN_DELTA',
-                self.tr('Mean of calculated delta.')
+                self.tr('Mean of calculated delta')
             ))  
 
         self.addOutput(
             QgsProcessingOutputNumber(
                 'Q1_DELTA',
-                self.tr('First quartile of delta.')
+                self.tr('First quartile of delta')
             ))  
 
         self.addOutput(
             QgsProcessingOutputNumber(
                 'Q2_DELTA',
-                self.tr('Second quartile (median) of delta.')
+                self.tr('Second quartile (median) of delta')
             ))  
 
         self.addOutput(
             QgsProcessingOutputNumber(
                 'Q3_DELTA',
-                self.tr('Third quartile of delta.')
+                self.tr('Third quartile of delta')
             ))  
 
 
         self.addOutput(
             QgsProcessingOutputNumber(
                 'MIN_DIST',
-                self.tr('Smallest distance.')
+                self.tr('Smallest distance')
             ))  
 
         self.addOutput(
             QgsProcessingOutputNumber(
                 'MAX_DIST',
-                self.tr('Largest calculated distance.')
+                self.tr('Largest calculated distance')
             ))  
 
         self.addOutput(
             QgsProcessingOutputNumber(
                 'MEAN_DIST',
-                self.tr('Mean of calculated distances.')
+                self.tr('Mean of calculated distances')
             ))  
 
         self.addOutput(
             QgsProcessingOutputNumber(
                 'Q1_DIST',
-                self.tr('First quartile of distances.')
+                self.tr('First quartile of distances')
             ))  
 
         self.addOutput(
             QgsProcessingOutputNumber(
                 'Q2_DIST',
-                self.tr('Second quartile (median) of distances.')
+                self.tr('Second quartile (median) of distances')
             ))  
 
         self.addOutput(
             QgsProcessingOutputNumber(
                 'Q3_DIST',
-                self.tr('Third quartile of distances.')
+                self.tr('Third quartile of distances')
             ))  
 
             
@@ -342,7 +342,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         try:
             sorted_features = [(float(f.attribute(compare_field)), f) for f in features]
         except ValueError as e:
-            feedback.pushWarning(self.tr(f'Error: Converting the field to floating point value failed with Value Error: {e.args[0]}\n'))
+            feedback.pushWarning(self.tr('Error: Converting the field to floating point value failed with Value Error: {}\n').format(e.args[0]))
 
             sorted_features = [(f.attribute(compare_field), f) for f in features]
             feedback.pushWarning(self.tr('WARNING: The fields will be compared as type: {0}').format(
@@ -587,7 +587,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
         return self.tr(h)
 
     def tr(self, string):
-        return QCoreApplication.translate('NearestGreater', string)
+        return QCoreApplication.translate('NearestGreaterAlgorithm', string)
         # return QCoreApplication.translate('Processing', string)
 
     def createInstance(self):
