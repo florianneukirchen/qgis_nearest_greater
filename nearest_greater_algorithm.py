@@ -107,7 +107,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
             QgsProcessingParameterFeatureSource(
                 self.INPUT,
                 self.tr('Input layer'),
-                [QgsProcessing.TypeVector]
+                [QgsProcessing.SourceType.TypeVector]
             )
         )
 
@@ -323,7 +323,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
                 context, out_fields, source.wkbType(), source.sourceCrs())
 
         (linesink, line_dest_id) = self.parameterAsSink(parameters, self.LINEOUTPUT,
-                context, out_fields, QgsWkbTypes.LineString, source.sourceCrs())
+                context, out_fields, QgsWkbTypes.Type.LineString, source.sourceCrs())
 
         if source.sourceCrs().isGeographic() and not ellipsoidal:
             feedback.pushWarning(self.tr('WARNING: The input is in a geographic CRS and you choosed to calculate distance on projected plane. Consider to calculate distance on ellipsoid or a layer in projected CRS.'))
@@ -450,7 +450,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
             newfeat.setAttributes(new_attributes)          
 
             # Add the feature in the sink
-            sink.addFeature(newfeat, QgsFeatureSink.FastInsert)
+            sink.addFeature(newfeat, QgsFeatureSink.Flag.FastInsert)
             
             # Create connecting lines in the line output layer
 
@@ -459,7 +459,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
             linefeat.setFields(out_fields)
             linefeat.setGeometry(linegeom)
             linefeat.setAttributes(new_attributes)             
-            linesink.addFeature(linefeat, QgsFeatureSink.FastInsert)
+            linesink.addFeature(linefeat, QgsFeatureSink.Flag.FastInsert)
 
             # Update the progress bar
             feedback.setProgress(int(current * total))
@@ -489,7 +489,7 @@ class NearestGreaterAlgorithm(QgsProcessingAlgorithm):
             
                 newfeat.setAttributes(new_attributes)          
             
-                sink.addFeature(newfeat, QgsFeatureSink.FastInsert)
+                sink.addFeature(newfeat, QgsFeatureSink.Flag.FastInsert)
 
                 feedback.setProgress(int(current * total))
                 current = current + 1
