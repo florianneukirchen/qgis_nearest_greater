@@ -28,8 +28,9 @@ The plugin uses the spatial index of QGIS to find nearest neighbours, which work
 
 ## Changelog
 
-## Git main
-- Get translation working
+## 2.1 (2025.07)
+- Support Qt6 / QGIS 4
+- Get translation working 
 - Add German translation
 
 ### 2.0 (2023-02)
