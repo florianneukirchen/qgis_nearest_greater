@@ -2,7 +2,6 @@
 name=Nearest with greater value
 qgisMinimumVersion=3.18
 qgisMaximumVersion=4.99
-supportsQt6=True
 description=Get name (or ID) of and distance to the nearest feature with greater value in a certain field of a point layer.
             Returns point layer with added attributes and a line layer with connecting lines.
 version=2.2
