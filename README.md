@@ -27,9 +27,11 @@ Use cases:
 The plugin uses the spatial index of QGIS to find nearest neighbours, which works on a plane, not on a globe. Some "nearest neighbours" might be incorrect if the correct nearest neighbour is on the other side of the datum line or one of the polar regions. However, this is only problematic if you are working with global data. 
 
 ## Changelog
+## 2.2 (2026-03)
+- Support QGIS 4.x
 
-## 2.1 (2025.07)
-- Support Qt6 / QGIS 4
+## 2.1 (2025-07)
+- Support Qt6 
 - Get translation working 
 - Add German translation
 
