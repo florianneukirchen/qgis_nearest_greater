@@ -1,7 +1,6 @@
 # QGIS plugin nearest greater 
 QGIS plugin to get name (or ID) of and distance to the nearest feature with greater value in a certain field; for every feature of a vector layer.
 
-- Homepage: [https://www.riannek.de/code/qgis-nearest-with-greater/](https://www.riannek.de/code/qgis-nearest-with-greater/)
 - Sourcecode: [https://github.com/florianneukirchen/qgis_nearest_greater](https://github.com/florianneukirchen/qgis_nearest_greater)
 - QGIS Plugin Repository: [https://plugins.qgis.org/plugins/qgis_nearest_greater/](https://plugins.qgis.org/plugins/qgis_nearest_greater/)
 - Bug Tracker: [https://github.com/florianneukirchen/qgis_nearest_greater/issues](https://github.com/florianneukirchen/qgis_nearest_greater/issues)
