@@ -4,7 +4,7 @@ qgisMinimumVersion=3.18
 qgisMaximumVersion=4.99
 description=Get name (or ID) of and distance to the nearest feature with greater value in a certain field of a point layer.
             Returns point layer with added attributes and a line layer with connecting lines.
-version=2.2
+version=2.3
 author=Florian Neukirchen
 email=mail@riannek.de
 
@@ -25,7 +25,9 @@ repository=https://github.com/florianneukirchen/qgis_nearest_greater
 hasProcessingProvider=yes
 # Uncomment the following line and add your changelog:
 
-changelog=2.2
+changelog=2.3
+    -Remove old and unused plugin builder scripts that were reported as security vulerability
+    2.2
     - Support QGIS 4.x
     2.1
     - Support Qt6 
